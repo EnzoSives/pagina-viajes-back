@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, Repository } from 'typeorm';
 import { Ciudad } from './entities/ciudad.entity';
 import { CiudadDTO } from './dto/create-ciudad.dto';
+import { Pais } from 'src/pais/entities/pais.entity';
 
 @Injectable()
 export class CiudadService {
 
   constructor(@InjectRepository(Ciudad)
-              private ciudadRepository : Repository<Ciudad>)
+              private ciudadRepository : Repository<Ciudad>,
+              @InjectRepository(Pais)
+              private paisRepository : Repository<Pais>)
   {}
 
   public async getAll():Promise<Ciudad[]>{
@@ -34,9 +37,11 @@ export class CiudadService {
 
   public async addCiudad( ciudadDTO : CiudadDTO ) : Promise<Ciudad>{
     try{
-      let ciudad : Ciudad = await this.ciudadRepository.save( new Ciudad(ciudadDTO.nombre) )
-      if(ciudad)
-        return ciudad;
+      let ciudad : Ciudad = new Ciudad(ciudadDTO.nombre, ciudadDTO.descripcion) 
+      ciudad.pais = await this.paisRepository.findOne({where:{id:ciudadDTO.id_pais}})
+      if(ciudad){
+        return await this.ciudadRepository.save(ciudad);
+      }
       else 
         throw new Error(`No se puedo agregar la ciudad`);
     }

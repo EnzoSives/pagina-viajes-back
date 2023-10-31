@@ -21,8 +21,9 @@ export class Ciudad {
   @OneToMany(() => Lugar, lugar => lugar.ciudad)
   lugares: Lugar[];
 
-  constructor(nombre:string){
+  constructor(nombre:string, descripcion:string){
     this.nombre = nombre;
+    this.descripcion = descripcion;
 }
 
 public getIdCiudad():number{

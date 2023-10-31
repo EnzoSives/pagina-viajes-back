@@ -1,34 +1,34 @@
 import { Pais } from 'src/pais/entities/pais.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
-
 @Entity('continentes')
 export class Continente {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ default: null}) 
   nombre: string;
 
-  @Column()
+  @Column({ default: null})
   descripcion: string;
 
   @OneToMany(() => Pais, pais => pais.continente)
   paises: Pais[];
 
-  constructor(nombre:string){
+  constructor(nombre: string, descripcion: string) {
     this.nombre = nombre;
-}
+    this.descripcion = descripcion;
+  }
 
-public getIdContinente():number{
+  public getIdContinente(): number {
     return this.id;
-}
+  }
 
-public getNombre():string{
+  public getNombre(): string {
     return this.nombre;
-}
+  }
 
-public setNombre(nombre:string){
+  public setNombre(nombre: string) {
     this.nombre = nombre;
-}
+  }
 }

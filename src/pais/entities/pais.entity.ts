@@ -8,8 +8,17 @@ export class Pais {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ default: null})
   nombre: string;
+
+  @Column({ default: null})
+  descripcion: string;
+  
+  @Column()
+  url_image: string;
+
+  @Column({ default: 0})
+  puntuacion: number;
 
   @OneToMany(() => Ciudad, ciudad => ciudad.pais)
   ciudades: Ciudad[];
@@ -18,8 +27,11 @@ export class Pais {
   @JoinColumn({ name: 'id_continente' })
   continente: Continente;
 
-  constructor(nombre: string) {
+  constructor(nombre: string, descripcion: string, url_image: string, puntuacion: number) {
     this.nombre = nombre;
+    this.descripcion = descripcion;
+    this.url_image = url_image;
+    this.puntuacion = puntuacion
   }
 
   public getIdPais(): number {

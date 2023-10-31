@@ -36,7 +36,7 @@ public async getId(id:number) : Promise<Continente>{
 
 public async addContinente( continenteDTO : ContinenteDTO ) : Promise<Continente>{
   try{
-    let continente : Continente = await this.continenteRepository.save( new Continente(continenteDTO.nombre) )
+    let continente : Continente = await this.continenteRepository.save( new Continente(continenteDTO.nombre, continenteDTO.descripcion) )
     if(continente)
       return continente;
     else 
