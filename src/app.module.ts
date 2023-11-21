@@ -9,6 +9,7 @@ import { CiudadModule } from './ciudad/ciudad.module';
 import { ContinenteModule } from './continente/continente.module';
 import { PreferenciaUsuarioModule } from './preferencia-usuario/preferencia-usuario.module';
 import { ImagenesModule } from './imagenes/imagenes.module';
+import { AuthModule } from './auth/auth.module';
 
 
 
@@ -24,7 +25,7 @@ import { ImagenesModule } from './imagenes/imagenes.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     })
-    ,PaisModule, LugarModule, UsersModule, CiudadModule, ContinenteModule, PreferenciaUsuarioModule, ImagenesModule],
+    ,PaisModule, LugarModule, UsersModule, CiudadModule, ContinenteModule, PreferenciaUsuarioModule, ImagenesModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,21 +1,28 @@
+import { Role } from 'src/common/enum/rol.enum';
 import { PreferenciaUsuario } from 'src/preferencia-usuario/entities/preferencia-usuario.entity'
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, DeleteDateColumn } from 'typeorm'
 
 @Entity()
 export class User {
-    
+
     @PrimaryGeneratedColumn()
-     id: number
+    id: number
 
-    @Column({unique: true})
-     username:string
+    @Column({ unique: true, nullable: false })
+    username: string
 
-     @Column()
-     password:string
+    @Column({ unique: true, nullable: false })
+    email: string;
 
-     @Column()
-     email:string
+    @Column({ nullable: false, select: false })
+    password: string;
 
-     @OneToMany(() => PreferenciaUsuario, preferenciaUsuario => preferenciaUsuario.user)
-     preferencias: PreferenciaUsuario[];
+    @Column({ type: 'enum', default: Role.USER, enum: Role })
+    role: Role;
+
+    @DeleteDateColumn()
+    deletedAt: Date; 
+
+    @OneToMany(() => PreferenciaUsuario, preferenciaUsuario => preferenciaUsuario.user)
+    preferencias: PreferenciaUsuario[];
 }

@@ -1,34 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ImagenesService } from './imagenes.service';
-import { CreateImageneDto } from './dto/create-imagen.dto';
-import { UpdateImageneDto } from './dto/update-imagen.dto';
+// imagen.controller.ts
+
+import { Controller, Post, UploadedFile, UseInterceptors, Body } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImagenDTO } from './dto/create-imagen.dto';
+import { ImagenService } from './imagenes.service';
+
 
 @Controller('imagenes')
-export class ImagenesController {
-  constructor(private readonly imagenesService: ImagenesService) {}
+export class ImagenController {
+  constructor(private readonly imagenService: ImagenService) {}
 
-  @Post()
-  create(@Body() createImageneDto: CreateImageneDto) {
-    return this.imagenesService.create(createImageneDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.imagenesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.imagenesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateImageneDto: UpdateImageneDto) {
-    return this.imagenesService.update(+id, updateImageneDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.imagenesService.remove(+id);
+  @Post('subir')
+  @UseInterceptors(FileInterceptor('imagen'))
+  async subirImagen(@UploadedFile() file: Express.Multer.File, @Body() imagenDTO: ImagenDTO) {
+    return this.imagenService.guardarImagen(file, imagenDTO);
   }
 }
+
+

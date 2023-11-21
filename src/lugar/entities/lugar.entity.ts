@@ -1,4 +1,5 @@
 import { Ciudad } from 'src/ciudad/entities/ciudad.entity';
+import { Imagen } from 'src/imagenes/entities/imagen.entity';
 import { PreferenciaUsuario } from 'src/preferencia-usuario/entities/preferencia-usuario.entity';
 import {
   Entity,
@@ -21,22 +22,34 @@ export class Lugar {
   descripcion: string;
 
   @Column()
-  url_image: string;
+  url_image1: string;
+
+  @Column()
+  url_image2: string;
+
+  @Column()
+  url_image3: string;
+
+  @Column()
+  url_image4: string;
 
   @ManyToOne(() => Ciudad, (ciudad) => ciudad.lugares)
   @JoinColumn({ name: 'id_ciudad' })
   ciudad: Ciudad;
 
+  @OneToMany(() => Imagen, (imagen) => imagen.lugar)
+  imagenes: Imagen[];
+  
   @OneToMany(
     () => PreferenciaUsuario,
     (preferenciaUsuario) => preferenciaUsuario.lugar,
   )
   preferenciaUsuario: PreferenciaUsuario[];
 
-  constructor(nombre: string, description: string, url_image: string) {
+  constructor(nombre: string, description: string) {
     this.nombre = nombre;
     this.descripcion = description;
-    this.url_image = url_image;
+  
 
   }
 

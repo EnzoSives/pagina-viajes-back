@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Lugar } from './entities/lugar.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { Ciudad } from 'src/ciudad/entities/ciudad.entity';
+import * as fs from 'fs';
+import * as path from 'path';
 
 
 @Injectable()
@@ -37,21 +39,53 @@ public async getId(id:number) : Promise<Lugar>{
   }
 }
 
-public async addLugar( lugarDTO : LugarDTO ) : Promise<Lugar>{
-  try{
-    let lugar : Lugar = new Lugar(lugarDTO.nombre, lugarDTO.descripcion, lugarDTO.url_image)
-    lugar.ciudad = await this.ciudadRepository.findOne({where: {id: lugarDTO.id_ciudad}})
-    if(lugar)
-      return await this.lugarRepository.save(lugar)
-      throw new Error(`No se puedo agregar la ciudad`);
-  }
-  catch(error){
-    throw new HttpException(
-      {status: HttpStatus.NOT_FOUND,error:`500 - ERROR: ` +error},
-      HttpStatus.NOT_FOUND
-    )
-  }
+async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lugar> {
+  const lugar = new Lugar(lugarDTO.nombre, lugarDTO.descripcion);
+  lugar.ciudad = await this.ciudadRepository.findOne({ where: { id: lugarDTO.id_ciudad } });
+
+  // Asignar las URLs de las imágenes a las propiedades correspondientes en la entidad Lugar
+  lugar.url_image1 = this.generateImageUrl(lugarDTO.nombre);
+  lugar.url_image2 = this.generateImageUrl(lugarDTO.nombre);
+  lugar.url_image3 = this.generateImageUrl(lugarDTO.nombre);
+  lugar.url_image4 = this.generateImageUrl(lugarDTO.nombre);
+
+  // Guardar las imágenes en el sistema de archivos
+  await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, index + 1)));
+
+  // Guardar el lugar en la base de datos
+  const lugarGuardado = await this.lugarRepository.save(lugar);
+
+  // Resto del código...
+
+  return lugarGuardado;
 }
+
+private generateImageUrl(nombre: string): string {
+  return `./uploads/${nombre}/`;
+}
+
+private saveImageToServer(file: Express.Multer.File, entidad: string, index: number): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const entityFolder = path.join(__dirname, '..', '..', 'uploads', entidad);
+
+    // Crea la carpeta de la entidad si no existe
+    if (!fs.existsSync(entityFolder)) {
+      fs.mkdirSync(entityFolder, { recursive: true });
+    }
+
+    const filePath = path.join(entityFolder, `${index}_${file.originalname}`);
+    fs.writeFile(filePath, file.buffer, (err) => {
+      if (err) {
+        console.error(`Error al guardar la imagen ${index}: ${err.message}`);
+        reject(err);
+      } else {
+        console.log(`Imagen ${index} guardada exitosamente.`);
+        resolve();
+      }
+    });
+  });
+}
+
 
 public async updateLugarId(id:number, lugarDTO : LugarDTO) : Promise<Lugar>{
     try{

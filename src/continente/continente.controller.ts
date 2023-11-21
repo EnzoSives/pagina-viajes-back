@@ -1,12 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put,UseGuards } from '@nestjs/common';
 import { ContinenteService } from './continente.service';
 import { ContinenteDTO } from './dto/create-continente.dto';
 import { Continente } from './entities/continente.entity';
 
+
 @Controller('continente')
 export class ContinenteController {
   constructor(private readonly continenteService: ContinenteService) {}
-
   @Get('all')
   async getCont(): Promise<Continente[]>{
     return this.continenteService.getAll();
