@@ -46,21 +46,12 @@ async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lu
   const lugar = new Lugar(lugarDTO.nombre, lugarDTO.descripcion);
   lugar.ciudad = await this.ciudadRepository.findOne({ where: { id: lugarDTO.id_ciudad } });
 
-  // Asignar las URLs de las imágenes a las propiedades correspondientes en la entidad Lugar
-  lugar.url_image1 = this.generateImageUrl(lugarDTO.nombre);
-  lugar.url_image2 = this.generateImageUrl(lugarDTO.nombre);
-  lugar.url_image3 = this.generateImageUrl(lugarDTO.nombre);
-  lugar.url_image4 = this.generateImageUrl(lugarDTO.nombre);
-
   const lugarGuardado = await this.lugarRepository.save(lugar);
   const lugarConId = await this.lugarRepository.findOne({ where: { id: lugarGuardado.id } });
-  // Guardar las imágenes en el sistema de archivos
-  await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, lugarConId.id)));
 
-  // Guardar el lugar en la base de datos
-
-  // Obtener el lugar con su ID asignado
-
+  // Guardar las imágenes en el sistema de archivos y asignar las URLs de las imágenes
+  const filePaths = await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, lugarConId.id)));
+  [lugar.url_image1, lugar.url_image2, lugar.url_image3, lugar.url_image4] = filePaths;
 
   if (!lugarConId) {
     throw new Error(`No se pudo obtener el lugar con el ID: ${lugarGuardado.id}`);
@@ -71,13 +62,12 @@ async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lu
   return lugarConId;
 }
 
-
-private generateImageUrl(nombre: string): string {
-  return path.join(this.uploadsPath, nombre);
+private generateImageUrl(nombre: string, id: number, filename: string): string {
+  return path.join(this.uploadsPath, nombre, id.toString(), filename);
 }
 
-private async saveImageToServer(file: Express.Multer.File, nombre: string, id: number): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
+private async saveImageToServer(file: Express.Multer.File, nombre: string, id: number): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
     const entityFolder = path.join(this.uploadsPath, nombre);
     const entityIdFolder = path.join(entityFolder, id.toString());
 
@@ -97,7 +87,7 @@ private async saveImageToServer(file: Express.Multer.File, nombre: string, id: n
         reject(err);
       } else {
         console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
-        resolve();
+        resolve(filePath);
       }
     });
   });
