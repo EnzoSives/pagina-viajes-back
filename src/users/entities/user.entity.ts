@@ -17,12 +17,15 @@ export class User {
     @Column({ nullable: false, select: false })
     password: string;
 
-    @Column({ type: 'enum', default: Role.USER, enum: Role })
-    role: Role;
-
     @DeleteDateColumn()
     deletedAt: Date; 
 
     @OneToMany(() => PreferenciaUsuario, preferenciaUsuario => preferenciaUsuario.user)
     preferencias: PreferenciaUsuario[];
+
+    constructor(username:string, password:string, email:string){
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 }
