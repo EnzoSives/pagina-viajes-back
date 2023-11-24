@@ -17,6 +17,9 @@ export class LugarService {
   private ciudadRepository : Repository<Ciudad>)
 {}
 
+private readonly uploadsPath: string = path.join(__dirname, '..', '..', 'uploads');
+
+
 public async getAll():Promise<Lugar[]>{
 return await this.lugarRepository.find();
 }
@@ -49,37 +52,51 @@ async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lu
   lugar.url_image3 = this.generateImageUrl(lugarDTO.nombre);
   lugar.url_image4 = this.generateImageUrl(lugarDTO.nombre);
 
+  const lugarGuardado = await this.lugarRepository.save(lugar);
+  const lugarConId = await this.lugarRepository.findOne({ where: { id: lugarGuardado.id } });
   // Guardar las imágenes en el sistema de archivos
-  await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, index + 1)));
+  await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, lugarConId.id)));
 
   // Guardar el lugar en la base de datos
-  const lugarGuardado = await this.lugarRepository.save(lugar);
+
+  // Obtener el lugar con su ID asignado
+
+
+  if (!lugarConId) {
+    throw new Error(`No se pudo obtener el lugar con el ID: ${lugarGuardado.id}`);
+  }
 
   // Resto del código...
 
-  return lugarGuardado;
+  return lugarConId;
 }
+
 
 private generateImageUrl(nombre: string): string {
-  return `./uploads/${nombre}/`;
+  return path.join(this.uploadsPath, nombre);
 }
 
-private saveImageToServer(file: Express.Multer.File, entidad: string, index: number): Promise<void> {
+private async saveImageToServer(file: Express.Multer.File, nombre: string, id: number): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    const entityFolder = path.join(__dirname, '..', '..', 'uploads', entidad);
+    const entityFolder = path.join(this.uploadsPath, nombre);
+    const entityIdFolder = path.join(entityFolder, id.toString());
 
-    // Crea la carpeta de la entidad si no existe
+    // Crea la carpeta de la entidad y el ID si no existen
     if (!fs.existsSync(entityFolder)) {
       fs.mkdirSync(entityFolder, { recursive: true });
     }
 
-    const filePath = path.join(entityFolder, `${index}_${file.originalname}`);
+    if (!fs.existsSync(entityIdFolder)) {
+      fs.mkdirSync(entityIdFolder, { recursive: true });
+    }
+
+    const filePath = path.join(entityIdFolder, `${file.originalname}`);
     fs.writeFile(filePath, file.buffer, (err) => {
       if (err) {
-        console.error(`Error al guardar la imagen ${index}: ${err.message}`);
+        console.error(`Error al guardar la imagen ${file.originalname}: ${err.message}`);
         reject(err);
       } else {
-        console.log(`Imagen ${index} guardada exitosamente.`);
+        console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
         resolve();
       }
     });
