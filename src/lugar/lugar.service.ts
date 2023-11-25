@@ -52,19 +52,21 @@ async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lu
   lugar.url_image3 = this.generateImageUrl(lugarDTO.nombre);
   lugar.url_image4 = this.generateImageUrl(lugarDTO.nombre);
 
-  // Guardar las imágenes en el sistema de archivos
-  await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, index + 1)));
-
-  // Guardar el lugar en la base de datos
   const lugarGuardado = await this.lugarRepository.save(lugar);
+  const lugarConId = await this.lugarRepository.findOne({ where: { id: lugarGuardado.id } });
+  // Guardar las imágenes en el sistema de archivos
+  await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, lugarConId.id)));
 
+  if (!lugarConId) {
+    throw new Error(`No se pudo obtener el lugar con el ID: ${lugarGuardado.id}`);
+  }
   // Resto del código...
-
-  return lugarGuardado;
+  return lugarConId;
 }
 
+
 private generateImageUrl(nombre: string): string {
-  return `./uploads/${nombre}/`;
+  return path.join(this.uploadsPath, nombre);
 }
 
 private async saveImageToServer(file: Express.Multer.File, nombre: string, id: number): Promise<string> {
@@ -76,11 +78,9 @@ private async saveImageToServer(file: Express.Multer.File, nombre: string, id: n
     if (!fs.existsSync(entityFolder)) {
       fs.mkdirSync(entityFolder, { recursive: true });
     }
-
     if (!fs.existsSync(entityIdFolder)) {
       fs.mkdirSync(entityIdFolder, { recursive: true });
     }
-
     const filePath = path.join(entityIdFolder, `${file.originalname}`);
     fs.writeFile(filePath, file.buffer, (err) => {
       if (err) {
