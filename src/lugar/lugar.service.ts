@@ -43,32 +43,49 @@ public async getId(id:number) : Promise<Lugar>{
 }
 
 async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lugar> {
+  // Crear un lugar sin ID asignado
   const lugar = new Lugar(lugarDTO.nombre, lugarDTO.descripcion);
   lugar.ciudad = await this.ciudadRepository.findOne({ where: { id: lugarDTO.id_ciudad } });
 
-  // Asignar las URLs de las imágenes a las propiedades correspondientes en la entidad Lugar
-  lugar.url_image1 = this.generateImageUrl(lugarDTO.nombre);
-  lugar.url_image2 = this.generateImageUrl(lugarDTO.nombre);
-  lugar.url_image3 = this.generateImageUrl(lugarDTO.nombre);
-  lugar.url_image4 = this.generateImageUrl(lugarDTO.nombre);
-
+  // Guardar el lugar sin persistirlo en la base de datos
   const lugarGuardado = await this.lugarRepository.save(lugar);
-  const lugarConId = await this.lugarRepository.findOne({ where: { id: lugarGuardado.id } });
-  // Guardar las imágenes en el sistema de archivos
-  await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, lugarConId.id)));
 
-  if (!lugarConId) {
-    throw new Error(`No se pudo obtener el lugar con el ID: ${lugarGuardado.id}`);
+  // Obtener el lugar con su ID asignado (ID provisional)
+  const lugarConIdProvisional = await this.lugarRepository.findOne({
+    where: { id: lugarGuardado.id },
+  });
+
+  if (!lugarConIdProvisional) {
+    throw new Error(`No se pudo obtener el lugar con el ID provisional: ${lugarGuardado.id}`);
   }
+
+  // Guardar las imágenes en el sistema de archivos y obtener las rutas
+  const fileNames = await Promise.all(files.map((file, index) =>
+    this.saveImageToServer(file, 'lugar', lugarConIdProvisional.id)
+  ));
+
+   // Asignar las URLs de las imágenes a las propiedades correspondientes en la entidad Lugar
+   lugarConIdProvisional.url_image1 = this.generateImageUrl(fileNames[0]);
+   lugarConIdProvisional.url_image2 = this.generateImageUrl(fileNames[1]);
+   lugarConIdProvisional.url_image3 = this.generateImageUrl(fileNames[2]);
+   lugarConIdProvisional.url_image4 = this.generateImageUrl(fileNames[3]);
+  
+
+  // Guardar el lugar actualizado en la base de datos
+  const lugarFinal = await this.lugarRepository.save(lugarConIdProvisional);
+
   // Resto del código...
-  return lugarConId;
+
+  return lugarFinal;
 }
 
 
-private generateImageUrl(nombre: string): string {
-  return path.join(this.uploadsPath, nombre);
-}
 
+
+private generateImageUrl( fileName: string): string {
+  const filePath= (fileName);
+  return filePath.split(path.sep).join('/');
+}
 private async saveImageToServer(file: Express.Multer.File, nombre: string, id: number): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const entityFolder = path.join(this.uploadsPath, nombre);
@@ -89,6 +106,33 @@ private async saveImageToServer(file: Express.Multer.File, nombre: string, id: n
       } else {
         console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
         resolve(filePath);
+      }
+    });
+  });
+}
+
+private async saveImageToServerWeb(file: Express.Multer.File, nombre: string, id: number): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const entityFolder = path.join(this.uploadsPath, nombre);
+    const entityIdFolder = path.join(entityFolder, id.toString());
+
+    // Crea la carpeta de la entidad y el ID si no existen
+    if (!fs.existsSync(entityFolder)) {
+      fs.mkdirSync(entityFolder, { recursive: true });
+    }
+    if (!fs.existsSync(entityIdFolder)) {
+      fs.mkdirSync(entityIdFolder, { recursive: true });
+    }
+    const filePath = path.join(entityIdFolder, `${file.originalname}`);
+    fs.writeFile(filePath, file.buffer, (err) => {
+      if (err) {
+        console.error(`Error al guardar la imagen ${file.originalname}: ${err.message}`);
+        reject(err);
+      } else {
+        console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
+        const urlPath = filePath.split(path.sep).join('/');
+        const imageUrl = `https://www.tusitio.com/${urlPath}`;
+        resolve(imageUrl);
       }
     });
   });

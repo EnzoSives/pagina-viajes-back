@@ -21,16 +21,16 @@ export class Lugar {
   @Column()
   descripcion: string;
 
-  @Column()
+  @Column({default:'url'})
   url_image1: string;
 
-  @Column()
+  @Column({default:'url'})
   url_image2: string;
 
-  @Column()
+  @Column({default:'url'})
   url_image3: string;
 
-  @Column()
+  @Column({default:'url'})
   url_image4: string;
 
   @ManyToOne(() => Ciudad, (ciudad) => ciudad.lugares)

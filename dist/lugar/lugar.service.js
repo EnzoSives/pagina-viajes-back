@@ -45,20 +45,24 @@ let LugarService = class LugarService {
     async agregarLugar(lugarDTO, files) {
         const lugar = new lugar_entity_1.Lugar(lugarDTO.nombre, lugarDTO.descripcion);
         lugar.ciudad = await this.ciudadRepository.findOne({ where: { id: lugarDTO.id_ciudad } });
-        lugar.url_image1 = this.generateImageUrl(lugarDTO.nombre);
-        lugar.url_image2 = this.generateImageUrl(lugarDTO.nombre);
-        lugar.url_image3 = this.generateImageUrl(lugarDTO.nombre);
-        lugar.url_image4 = this.generateImageUrl(lugarDTO.nombre);
         const lugarGuardado = await this.lugarRepository.save(lugar);
-        const lugarConId = await this.lugarRepository.findOne({ where: { id: lugarGuardado.id } });
-        await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, lugarConId.id)));
-        if (!lugarConId) {
-            throw new Error(`No se pudo obtener el lugar con el ID: ${lugarGuardado.id}`);
+        const lugarConIdProvisional = await this.lugarRepository.findOne({
+            where: { id: lugarGuardado.id },
+        });
+        if (!lugarConIdProvisional) {
+            throw new Error(`No se pudo obtener el lugar con el ID provisional: ${lugarGuardado.id}`);
         }
-        return lugarConId;
+        const fileNames = await Promise.all(files.map((file, index) => this.saveImageToServer(file, 'lugar', lugarConIdProvisional.id)));
+        lugarConIdProvisional.url_image1 = this.generateImageUrl(fileNames[0]);
+        lugarConIdProvisional.url_image2 = this.generateImageUrl(fileNames[1]);
+        lugarConIdProvisional.url_image3 = this.generateImageUrl(fileNames[2]);
+        lugarConIdProvisional.url_image4 = this.generateImageUrl(fileNames[3]);
+        const lugarFinal = await this.lugarRepository.save(lugarConIdProvisional);
+        return lugarFinal;
     }
-    generateImageUrl(nombre) {
-        return path.join(this.uploadsPath, nombre);
+    generateImageUrl(fileName) {
+        const filePath = (fileName);
+        return filePath.split(path.sep).join('/');
     }
     async saveImageToServer(file, nombre, id) {
         return new Promise((resolve, reject) => {
@@ -79,6 +83,31 @@ let LugarService = class LugarService {
                 else {
                     console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
                     resolve(filePath);
+                }
+            });
+        });
+    }
+    async saveImageToServerWeb(file, nombre, id) {
+        return new Promise((resolve, reject) => {
+            const entityFolder = path.join(this.uploadsPath, nombre);
+            const entityIdFolder = path.join(entityFolder, id.toString());
+            if (!fs.existsSync(entityFolder)) {
+                fs.mkdirSync(entityFolder, { recursive: true });
+            }
+            if (!fs.existsSync(entityIdFolder)) {
+                fs.mkdirSync(entityIdFolder, { recursive: true });
+            }
+            const filePath = path.join(entityIdFolder, `${file.originalname}`);
+            fs.writeFile(filePath, file.buffer, (err) => {
+                if (err) {
+                    console.error(`Error al guardar la imagen ${file.originalname}: ${err.message}`);
+                    reject(err);
+                }
+                else {
+                    console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
+                    const urlPath = filePath.split(path.sep).join('/');
+                    const imageUrl = `https://www.tusitio.com/${urlPath}`;
+                    resolve(imageUrl);
                 }
             });
         });

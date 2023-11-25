@@ -43,19 +43,19 @@ __decorate([
     __metadata("design:type", String)
 ], Lugar.prototype, "descripcion", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: 'url' }),
     __metadata("design:type", String)
 ], Lugar.prototype, "url_image1", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: 'url' }),
     __metadata("design:type", String)
 ], Lugar.prototype, "url_image2", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: 'url' }),
     __metadata("design:type", String)
 ], Lugar.prototype, "url_image3", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: 'url' }),
     __metadata("design:type", String)
 ], Lugar.prototype, "url_image4", void 0);
 __decorate([

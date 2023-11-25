@@ -13,6 +13,7 @@ export declare class LugarService {
     agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lugar>;
     private generateImageUrl;
     private saveImageToServer;
+    private saveImageToServerWeb;
     updateLugarId(id: number, lugarDTO: LugarDTO): Promise<Lugar>;
     deleteLugar(id: number): Promise<boolean>;
 }
