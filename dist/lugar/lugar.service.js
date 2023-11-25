@@ -45,17 +45,16 @@ let LugarService = class LugarService {
     async agregarLugar(lugarDTO, files) {
         const lugar = new lugar_entity_1.Lugar(lugarDTO.nombre, lugarDTO.descripcion);
         lugar.ciudad = await this.ciudadRepository.findOne({ where: { id: lugarDTO.id_ciudad } });
+        lugar.url_image1 = this.generateImageUrl(lugarDTO.nombre);
+        lugar.url_image2 = this.generateImageUrl(lugarDTO.nombre);
+        lugar.url_image3 = this.generateImageUrl(lugarDTO.nombre);
+        lugar.url_image4 = this.generateImageUrl(lugarDTO.nombre);
+        await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, index + 1)));
         const lugarGuardado = await this.lugarRepository.save(lugar);
-        const lugarConId = await this.lugarRepository.findOne({ where: { id: lugarGuardado.id } });
-        const filePaths = await Promise.all(files.map((file, index) => this.saveImageToServer(file, lugarDTO.nombre, lugarConId.id)));
-        [lugar.url_image1, lugar.url_image2, lugar.url_image3, lugar.url_image4] = filePaths;
-        if (!lugarConId) {
-            throw new Error(`No se pudo obtener el lugar con el ID: ${lugarGuardado.id}`);
-        }
-        return lugarConId;
+        return lugarGuardado;
     }
-    generateImageUrl(nombre, id, filename) {
-        return path.join(this.uploadsPath, nombre, id.toString(), filename);
+    generateImageUrl(nombre) {
+        return `./uploads/${nombre}/`;
     }
     async saveImageToServer(file, nombre, id) {
         return new Promise((resolve, reject) => {
