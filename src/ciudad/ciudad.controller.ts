@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { CiudadService } from './ciudad.service';
 import { Ciudad } from './entities/ciudad.entity';
 import { CiudadDTO } from './dto/create-ciudad.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+
 
 @Controller('ciudad')
 export class CiudadController {
@@ -18,8 +20,9 @@ export class CiudadController {
   }
 
   @Post('crear')
-  addCiudad(@Body() ciudad:CiudadDTO ) : Promise<Ciudad>{
-      return this.ciudadService.addCiudad(ciudad);
+  @UseInterceptors(FilesInterceptor('imagenes', 4)) // 'imagenes' es el nombre del campo para las imágenes y 4 es el número máximo de archivos
+  async addLugar(@UploadedFiles() files: Express.Multer.File[], @Body() CiudadDTO: CiudadDTO): Promise<Ciudad> {
+    return this.ciudadService.agregarCiudad(CiudadDTO, files);
   }
 
   @Put('actualizar/:id')

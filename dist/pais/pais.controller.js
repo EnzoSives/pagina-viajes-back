@@ -16,6 +16,7 @@ exports.PaisController = void 0;
 const common_1 = require("@nestjs/common");
 const pais_service_1 = require("./pais.service");
 const create_pais_dto_1 = require("./dto/create-pais.dto");
+const platform_express_1 = require("@nestjs/platform-express");
 let PaisController = class PaisController {
     constructor(paisService) {
         this.paisService = paisService;
@@ -26,8 +27,8 @@ let PaisController = class PaisController {
     async getId(id) {
         return this.paisService.getId(id);
     }
-    addPais(pais) {
-        return this.paisService.addPais(pais);
+    async addLugar(files, PaisDTO) {
+        return this.paisService.agregarPais(PaisDTO, files);
     }
     updatePaisId(id, pais) {
         return this.paisService.updatePaisId(id, pais);
@@ -52,11 +53,13 @@ __decorate([
 ], PaisController.prototype, "getId", null);
 __decorate([
     (0, common_1.Post)('crear'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('imagenes', 4)),
+    __param(0, (0, common_1.UploadedFiles)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_pais_dto_1.PaisDTO]),
+    __metadata("design:paramtypes", [Array, create_pais_dto_1.PaisDTO]),
     __metadata("design:returntype", Promise)
-], PaisController.prototype, "addPais", null);
+], PaisController.prototype, "addLugar", null);
 __decorate([
     (0, common_1.Put)('actualizar/:id'),
     __param(0, (0, common_1.Param)('id')),

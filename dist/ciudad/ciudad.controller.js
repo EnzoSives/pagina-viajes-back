@@ -16,6 +16,7 @@ exports.CiudadController = void 0;
 const common_1 = require("@nestjs/common");
 const ciudad_service_1 = require("./ciudad.service");
 const create_ciudad_dto_1 = require("./dto/create-ciudad.dto");
+const platform_express_1 = require("@nestjs/platform-express");
 let CiudadController = class CiudadController {
     constructor(ciudadService) {
         this.ciudadService = ciudadService;
@@ -26,8 +27,8 @@ let CiudadController = class CiudadController {
     async getId(id) {
         return this.ciudadService.getId(id);
     }
-    addCiudad(ciudad) {
-        return this.ciudadService.addCiudad(ciudad);
+    async addLugar(files, CiudadDTO) {
+        return this.ciudadService.agregarCiudad(CiudadDTO, files);
     }
     updateCiudadId(id, ciudad) {
         return this.ciudadService.updateCiudadId(id, ciudad);
@@ -52,11 +53,13 @@ __decorate([
 ], CiudadController.prototype, "getId", null);
 __decorate([
     (0, common_1.Post)('crear'),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('imagenes', 4)),
+    __param(0, (0, common_1.UploadedFiles)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_ciudad_dto_1.CiudadDTO]),
+    __metadata("design:paramtypes", [Array, create_ciudad_dto_1.CiudadDTO]),
     __metadata("design:returntype", Promise)
-], CiudadController.prototype, "addCiudad", null);
+], CiudadController.prototype, "addLugar", null);
 __decorate([
     (0, common_1.Put)('actualizar/:id'),
     __param(0, (0, common_1.Param)('id')),

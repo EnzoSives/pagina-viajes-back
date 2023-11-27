@@ -18,10 +18,13 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const pais_entity_1 = require("./entities/pais.entity");
 const continente_entity_1 = require("../continente/entities/continente.entity");
+const fs = require("fs");
+const path = require("path");
 let PaisService = class PaisService {
     constructor(paisRepository, continenteRepository) {
         this.paisRepository = paisRepository;
         this.continenteRepository = continenteRepository;
+        this.uploadsPath = path.join(__dirname, '..', '..', 'uploads');
     }
     async getAll() {
         return await this.paisRepository.find();
@@ -39,18 +42,50 @@ let PaisService = class PaisService {
             throw new common_1.HttpException({ status: common_1.HttpStatus.NOT_FOUND, error: `500 - ERROR: ` + error }, common_1.HttpStatus.NOT_FOUND);
         }
     }
-    async addPais(paisDTO) {
-        try {
-            let pais = new pais_entity_1.Pais(paisDTO.nombre, paisDTO.descripcion, paisDTO.url_image, paisDTO.puntuacion);
-            pais.continente = await this.continenteRepository.findOne({ where: { id: paisDTO.id_continente } });
-            if (pais)
-                return await this.paisRepository.save(pais);
-            else
-                throw new Error(`No se puedo agregar la ciudad`);
+    async agregarPais(paisDTO, files) {
+        const pais = new pais_entity_1.Pais(paisDTO.nombre, paisDTO.descripcion);
+        pais.continente = await this.continenteRepository.findOne({ where: { id: paisDTO.id_continente } });
+        const paisGuardado = await this.paisRepository.save(pais);
+        const paisConIdProvisional = await this.paisRepository.findOne({
+            where: { id: paisGuardado.id },
+        });
+        if (!paisConIdProvisional) {
+            throw new Error(`No se pudo obtener el país con el ID provisional: ${paisGuardado.id}`);
         }
-        catch (error) {
-            throw new common_1.HttpException({ status: common_1.HttpStatus.NOT_FOUND, error: `500 - ERROR: ` + error }, common_1.HttpStatus.NOT_FOUND);
-        }
+        const fileNames = await Promise.all(files.map((file, index) => this.saveImageToServer(file, 'pais', paisConIdProvisional.id)));
+        paisConIdProvisional.url_image1 = this.generateImageUrl(fileNames[0]);
+        paisConIdProvisional.url_image2 = this.generateImageUrl(fileNames[1]);
+        paisConIdProvisional.url_image3 = this.generateImageUrl(fileNames[2]);
+        paisConIdProvisional.url_image4 = this.generateImageUrl(fileNames[3]);
+        const paisFinal = await this.paisRepository.save(paisConIdProvisional);
+        return paisFinal;
+    }
+    generateImageUrl(fileName) {
+        const filePath = (fileName);
+        return filePath.split(path.sep).join('/');
+    }
+    async saveImageToServer(file, nombre, id) {
+        return new Promise((resolve, reject) => {
+            const entityFolder = path.join(this.uploadsPath, nombre);
+            const entityIdFolder = path.join(entityFolder, id.toString());
+            if (!fs.existsSync(entityFolder)) {
+                fs.mkdirSync(entityFolder, { recursive: true });
+            }
+            if (!fs.existsSync(entityIdFolder)) {
+                fs.mkdirSync(entityIdFolder, { recursive: true });
+            }
+            const filePath = path.join(entityIdFolder, `${file.originalname}`);
+            fs.writeFile(filePath, file.buffer, (err) => {
+                if (err) {
+                    console.error(`Error al guardar la imagen ${file.originalname}: ${err.message}`);
+                    reject(err);
+                }
+                else {
+                    console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
+                    resolve(filePath);
+                }
+            });
+        });
     }
     async updatePaisId(id, paisDTO) {
         try {

@@ -17,11 +17,19 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: 
+      // 'bpeyvodevjsywngcdapn-mysql.services.clever-cloud.com',
+      'localhost',
       port: 3306,
-      username: 'root',
-      password: 'Cristiano7',
-      database: 'db_tp',
+      username: 
+      // 'ud9gxrkbn7fiilx5',
+      'root',
+      password: 
+      // 'KwJxKGuGvgADKi3hu8yT',
+      'Cristiano7',
+      database: 
+      // 'bpeyvodevjsywngcdapn',
+      'db_tp',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     })

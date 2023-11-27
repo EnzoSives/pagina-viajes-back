@@ -14,11 +14,17 @@ export class Pais {
   @Column({ default: null})
   descripcion: string;
   
-  @Column()
-  url_image: string;
+  @Column({default:'url'})
+  url_image1: string;
 
-  @Column({ default: 0})
-  puntuacion: number;
+  @Column({default:'url'})
+  url_image2: string;
+
+  @Column({default:'url'})
+  url_image3: string;
+
+  @Column({default:'url'})
+  url_image4: string;
 
   @OneToMany(() => Ciudad, ciudad => ciudad.pais)
   ciudades: Ciudad[];
@@ -27,11 +33,10 @@ export class Pais {
   @JoinColumn({ name: 'id_continente' })
   continente: Continente;
 
-  constructor(nombre: string, descripcion: string, url_image: string, puntuacion: number) {
+  constructor(nombre: string, descripcion: string) {
     this.nombre = nombre;
     this.descripcion = descripcion;
-    this.url_image = url_image;
-    this.puntuacion = puntuacion
+    
   }
 
   public getIdPais(): number {

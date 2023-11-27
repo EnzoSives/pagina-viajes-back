@@ -20,6 +20,7 @@ const typeorm_2 = require("typeorm");
 const ciudad_entity_1 = require("../ciudad/entities/ciudad.entity");
 const fs = require("fs");
 const path = require("path");
+const sharp = require("sharp");
 let LugarService = class LugarService {
     constructor(lugarRepository, ciudadRepository) {
         this.lugarRepository = lugarRepository;
@@ -75,13 +76,15 @@ let LugarService = class LugarService {
                 fs.mkdirSync(entityIdFolder, { recursive: true });
             }
             const filePath = path.join(entityIdFolder, `${file.originalname}`);
-            fs.writeFile(filePath, file.buffer, (err) => {
+            sharp(file.buffer)
+                .resize({ width: 800, height: 600 })
+                .toFile(filePath, (err, info) => {
                 if (err) {
-                    console.error(`Error al guardar la imagen ${file.originalname}: ${err.message}`);
+                    console.error(`Error al guardar y comprimir la imagen ${file.originalname}: ${err.message}`);
                     reject(err);
                 }
                 else {
-                    console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
+                    console.log(`Imagen ${file.originalname} guardada y comprimida exitosamente en ${filePath}`);
                     resolve(filePath);
                 }
             });

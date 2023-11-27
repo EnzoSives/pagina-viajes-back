@@ -14,11 +14,9 @@ const ciudad_entity_1 = require("../../ciudad/entities/ciudad.entity");
 const continente_entity_1 = require("../../continente/entities/continente.entity");
 const typeorm_1 = require("typeorm");
 let Pais = class Pais {
-    constructor(nombre, descripcion, url_image, puntuacion) {
+    constructor(nombre, descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.url_image = url_image;
-        this.puntuacion = puntuacion;
     }
     getIdPais() {
         return this.id;
@@ -44,13 +42,21 @@ __decorate([
     __metadata("design:type", String)
 ], Pais.prototype, "descripcion", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: 'url' }),
     __metadata("design:type", String)
-], Pais.prototype, "url_image", void 0);
+], Pais.prototype, "url_image1", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: 0 }),
-    __metadata("design:type", Number)
-], Pais.prototype, "puntuacion", void 0);
+    (0, typeorm_1.Column)({ default: 'url' }),
+    __metadata("design:type", String)
+], Pais.prototype, "url_image2", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'url' }),
+    __metadata("design:type", String)
+], Pais.prototype, "url_image3", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'url' }),
+    __metadata("design:type", String)
+], Pais.prototype, "url_image4", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => ciudad_entity_1.Ciudad, ciudad => ciudad.pais),
     __metadata("design:type", Array)
@@ -62,6 +68,6 @@ __decorate([
 ], Pais.prototype, "continente", void 0);
 exports.Pais = Pais = __decorate([
     (0, typeorm_1.Entity)('paises'),
-    __metadata("design:paramtypes", [String, String, String, Number])
+    __metadata("design:paramtypes", [String, String])
 ], Pais);
 //# sourceMappingURL=pais.entity.js.map

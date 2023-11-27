@@ -7,6 +7,7 @@ import { FindOneOptions, Repository } from 'typeorm';
 import { Ciudad } from 'src/ciudad/entities/ciudad.entity';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as sharp from 'sharp';
 
 
 @Injectable()
@@ -74,8 +75,6 @@ async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lu
   // Guardar el lugar actualizado en la base de datos
   const lugarFinal = await this.lugarRepository.save(lugarConIdProvisional);
 
-  // Resto del código...
-
   return lugarFinal;
 }
 
@@ -98,16 +97,21 @@ private async saveImageToServer(file: Express.Multer.File, nombre: string, id: n
     if (!fs.existsSync(entityIdFolder)) {
       fs.mkdirSync(entityIdFolder, { recursive: true });
     }
+
     const filePath = path.join(entityIdFolder, `${file.originalname}`);
-    fs.writeFile(filePath, file.buffer, (err) => {
-      if (err) {
-        console.error(`Error al guardar la imagen ${file.originalname}: ${err.message}`);
-        reject(err);
-      } else {
-        console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
-        resolve(filePath);
-      }
-    });
+
+    // Utiliza sharp para comprimir la imagen antes de guardarla
+    sharp(file.buffer)
+      .resize({ width: 800, height: 600 })  // Puedes ajustar el tamaño según tus necesidades
+      .toFile(filePath, (err, info) => {
+        if (err) {
+          console.error(`Error al guardar y comprimir la imagen ${file.originalname}: ${err.message}`);
+          reject(err);
+        } else {
+          console.log(`Imagen ${file.originalname} guardada y comprimida exitosamente en ${filePath}`);
+          resolve(filePath);
+        }
+      });
   });
 }
 

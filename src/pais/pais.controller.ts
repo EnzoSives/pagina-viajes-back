@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch,Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch,Put, Param, Delete, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { PaisService } from './pais.service';
 import { Pais } from './entities/pais.entity';
 import { PaisDTO } from './dto/create-pais.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+
 
 @Controller('pais')
 export class PaisController {
@@ -17,9 +19,10 @@ export class PaisController {
     return this.paisService.getId(id)
   }
 
-   @Post('crear')
-  addPais(@Body() pais:PaisDTO ) : Promise<Pais>{
-      return this.paisService.addPais(pais);
+  @Post('crear')
+  @UseInterceptors(FilesInterceptor('imagenes', 4)) // 'imagenes' es el nombre del campo para las imágenes y 4 es el número máximo de archivos
+  async addLugar(@UploadedFiles() files: Express.Multer.File[], @Body() PaisDTO: PaisDTO): Promise<Pais> {
+    return this.paisService.agregarPais(PaisDTO, files);
   }
 
    @Put('actualizar/:id')

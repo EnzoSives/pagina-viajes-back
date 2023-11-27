@@ -14,6 +14,18 @@ export class Ciudad {
   @Column()
   descripcion: string;
 
+  @Column({default:'url'})
+  url_image1: string;
+
+  @Column({default:'url'})
+  url_image2: string;
+
+  @Column({default:'url'})
+  url_image3: string;
+
+  @Column({default:'url'})
+  url_image4: string;
+
   @ManyToOne(() => Pais, pais => pais.ciudades)
   @JoinColumn({ name: 'id_pais' })
   pais: Pais;

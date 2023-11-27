@@ -18,10 +18,15 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const ciudad_entity_1 = require("./entities/ciudad.entity");
 const pais_entity_1 = require("../pais/entities/pais.entity");
+const fs = require("fs");
+const path = require("path");
+const lugar_entity_1 = require("../lugar/entities/lugar.entity");
 let CiudadService = class CiudadService {
-    constructor(ciudadRepository, paisRepository) {
+    constructor(ciudadRepository, paisRepository, lugarRepository) {
         this.ciudadRepository = ciudadRepository;
         this.paisRepository = paisRepository;
+        this.lugarRepository = lugarRepository;
+        this.uploadsPath = path.join(__dirname, '..', '..', 'uploads');
     }
     async getAll() {
         return await this.ciudadRepository.find();
@@ -39,19 +44,50 @@ let CiudadService = class CiudadService {
             throw new common_1.HttpException({ status: common_1.HttpStatus.NOT_FOUND, error: `500 - ERROR: ` + error }, common_1.HttpStatus.NOT_FOUND);
         }
     }
-    async addCiudad(ciudadDTO) {
-        try {
-            let ciudad = new ciudad_entity_1.Ciudad(ciudadDTO.nombre, ciudadDTO.descripcion);
-            ciudad.pais = await this.paisRepository.findOne({ where: { id: ciudadDTO.id_pais } });
-            if (ciudad) {
-                return await this.ciudadRepository.save(ciudad);
+    async agregarCiudad(ciudadDTO, files) {
+        const ciudad = new ciudad_entity_1.Ciudad(ciudadDTO.nombre, ciudadDTO.descripcion);
+        ciudad.pais = await this.paisRepository.findOne({ where: { id: ciudadDTO.id_pais } });
+        const ciudadGuardado = await this.paisRepository.save(ciudad);
+        const ciudadConIdProvisional = await this.paisRepository.findOne({
+            where: { id: ciudadGuardado.id },
+        });
+        if (!ciudadConIdProvisional) {
+            throw new Error(`No se pudo obtener el país con el ID provisional: ${ciudadGuardado.id}`);
+        }
+        const fileNames = await Promise.all(files.map((file, index) => this.saveImageToServer(file, 'ciudad', ciudadConIdProvisional.id)));
+        ciudadConIdProvisional.url_image1 = this.generateImageUrl(fileNames[0]);
+        ciudadConIdProvisional.url_image2 = this.generateImageUrl(fileNames[1]);
+        ciudadConIdProvisional.url_image3 = this.generateImageUrl(fileNames[2]);
+        ciudadConIdProvisional.url_image4 = this.generateImageUrl(fileNames[3]);
+        const ciudadFinal = await this.ciudadRepository.save(ciudadConIdProvisional);
+        return ciudadFinal;
+    }
+    generateImageUrl(fileName) {
+        const filePath = (fileName);
+        return filePath.split(path.sep).join('/');
+    }
+    async saveImageToServer(file, nombre, id) {
+        return new Promise((resolve, reject) => {
+            const entityFolder = path.join(this.uploadsPath, nombre);
+            const entityIdFolder = path.join(entityFolder, id.toString());
+            if (!fs.existsSync(entityFolder)) {
+                fs.mkdirSync(entityFolder, { recursive: true });
             }
-            else
-                throw new Error(`No se puedo agregar la ciudad`);
-        }
-        catch (error) {
-            throw new common_1.HttpException({ status: common_1.HttpStatus.NOT_FOUND, error: `500 - ERROR: ` + error }, common_1.HttpStatus.NOT_FOUND);
-        }
+            if (!fs.existsSync(entityIdFolder)) {
+                fs.mkdirSync(entityIdFolder, { recursive: true });
+            }
+            const filePath = path.join(entityIdFolder, `${file.originalname}`);
+            fs.writeFile(filePath, file.buffer, (err) => {
+                if (err) {
+                    console.error(`Error al guardar la imagen ${file.originalname}: ${err.message}`);
+                    reject(err);
+                }
+                else {
+                    console.log(`Imagen ${file.originalname} guardada exitosamente en ${filePath}`);
+                    resolve(filePath);
+                }
+            });
+        });
     }
     async updateCiudadId(id, ciudadDTO) {
         try {
@@ -90,7 +126,9 @@ exports.CiudadService = CiudadService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(ciudad_entity_1.Ciudad)),
     __param(1, (0, typeorm_1.InjectRepository)(pais_entity_1.Pais)),
+    __param(2, (0, typeorm_1.InjectRepository)(lugar_entity_1.Lugar)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository])
 ], CiudadService);
 //# sourceMappingURL=ciudad.service.js.map

@@ -42,6 +42,22 @@ __decorate([
     __metadata("design:type", String)
 ], Ciudad.prototype, "descripcion", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ default: 'url' }),
+    __metadata("design:type", String)
+], Ciudad.prototype, "url_image1", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'url' }),
+    __metadata("design:type", String)
+], Ciudad.prototype, "url_image2", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'url' }),
+    __metadata("design:type", String)
+], Ciudad.prototype, "url_image3", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 'url' }),
+    __metadata("design:type", String)
+], Ciudad.prototype, "url_image4", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => pais_entity_1.Pais, pais => pais.ciudades),
     (0, typeorm_1.JoinColumn)({ name: 'id_pais' }),
     __metadata("design:type", pais_entity_1.Pais)
