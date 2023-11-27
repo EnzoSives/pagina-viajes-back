@@ -8,6 +8,7 @@ export declare class AuthController {
     login(loginDto: LoginDto): Promise<{
         access_token: string;
         email: string;
+        id: number;
     }>;
     getUser(req: any): Promise<{
         user: import("../users/entities/user.entity").User;

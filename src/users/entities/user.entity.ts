@@ -1,6 +1,7 @@
+import { Blog } from 'src/blogs/entities/blog.entity';
 import { Role } from 'src/common/enum/rol.enum';
 import { PreferenciaUsuario } from 'src/preferencia-usuario/entities/preferencia-usuario.entity'
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, DeleteDateColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, DeleteDateColumn, JoinColumn } from 'typeorm'
 
 @Entity()
 export class User {
@@ -22,6 +23,9 @@ export class User {
 
     @OneToMany(() => PreferenciaUsuario, preferenciaUsuario => preferenciaUsuario.user)
     preferencias: PreferenciaUsuario[];
+
+    @OneToMany(() => Blog, blog => blog.user)
+    blogs: Blog[];
 
     constructor(username:string, password:string, email:string){
         this.username = username;

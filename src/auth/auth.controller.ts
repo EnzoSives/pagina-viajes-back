@@ -22,8 +22,8 @@ export class AuthController{
     @Get('user')
     async getUser(@Request() req) {
         // req.user contendrá la información del usuario autenticado
-        const { email } = req.user;
-        const user = await this.authService.findUserByEmail(email);
+        const { id } = req.user.id;
+        const user = await this.authService.findUserById(id);
         return { user };
     }
 }

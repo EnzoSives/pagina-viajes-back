@@ -10,6 +10,8 @@ import { ContinenteModule } from './continente/continente.module';
 import { PreferenciaUsuarioModule } from './preferencia-usuario/preferencia-usuario.module';
 import { ImagenesModule } from './imagenes/imagenes.module';
 import { AuthModule } from './auth/auth.module';
+import { BlogsModule } from './blogs/blogs.module';
+
 
 
 
@@ -26,14 +28,14 @@ import { AuthModule } from './auth/auth.module';
       'root',
       password: 
       // 'KwJxKGuGvgADKi3hu8yT',
-      'Cristiano7',
+      '4YwuPbb7W0uxGHg',
       database: 
       // 'bpeyvodevjsywngcdapn',
       'db_tp',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     })
-    ,PaisModule, LugarModule, UsersModule, CiudadModule, ContinenteModule, PreferenciaUsuarioModule, ImagenesModule, AuthModule],
+    ,PaisModule, LugarModule, UsersModule, CiudadModule, ContinenteModule, PreferenciaUsuarioModule, ImagenesModule, AuthModule, BlogsModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -19,6 +19,7 @@ const continente_module_1 = require("./continente/continente.module");
 const preferencia_usuario_module_1 = require("./preferencia-usuario/preferencia-usuario.module");
 const imagenes_module_1 = require("./imagenes/imagenes.module");
 const auth_module_1 = require("./auth/auth.module");
+const blogs_module_1 = require("./blogs/blogs.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -30,12 +31,12 @@ exports.AppModule = AppModule = __decorate([
                 host: 'localhost',
                 port: 3306,
                 username: 'root',
-                password: 'Cristiano7',
+                password: '4YwuPbb7W0uxGHg',
                 database: 'db_tp',
                 entities: [__dirname + '/**/*.entity{.ts,.js}'],
                 synchronize: true,
             }),
-            pais_module_1.PaisModule, lugar_module_1.LugarModule, users_module_1.UsersModule, ciudad_module_1.CiudadModule, continente_module_1.ContinenteModule, preferencia_usuario_module_1.PreferenciaUsuarioModule, imagenes_module_1.ImagenesModule, auth_module_1.AuthModule
+            pais_module_1.PaisModule, lugar_module_1.LugarModule, users_module_1.UsersModule, ciudad_module_1.CiudadModule, continente_module_1.ContinenteModule, preferencia_usuario_module_1.PreferenciaUsuarioModule, imagenes_module_1.ImagenesModule, auth_module_1.AuthModule, blogs_module_1.BlogsModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

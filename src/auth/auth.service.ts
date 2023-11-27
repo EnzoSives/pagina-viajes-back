@@ -27,30 +27,31 @@ export class AuthService{
         });
     }
 
-    async login ({ email, password}: LoginDto){
+    async login({ email, password }: LoginDto) {
         const user = await this.usersService.findByEmailWithPassword(email);
-        if(!user){
-            throw new UnauthorizedException('email erroneo');
+        if (!user) {
+          throw new UnauthorizedException('email erroneo');
         }
-        const isPasswordValid = await bcrypt.compare(password, user.password)
-        if (!isPasswordValid){
-            throw new UnauthorizedException('password incorrecto');
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+          throw new UnauthorizedException('password incorrecto');
         }
-        const payload = {email: user.email};
+        const payload = { id: user.id, email: user.email };
         const access_token = await this.jwtService.signAsync(payload);
-
-        return{
-            access_token,
-            email
+      
+        return {
+          access_token,
+          email,
+          id: user.id,
         };
-    }
+      }
 
   async getUserByToken(token: string) {
     try {
         const decodedToken = this.jwtService.verify(token);
-        const { email } = decodedToken;
-        console.log(this.findUserByEmail(email));
-        return this.findUserByEmail(email);
+        const { id } = decodedToken;
+        console.log(this.findUserById(id));
+        return this.findUserById(id);
     } catch (error) {
         throw new UnauthorizedException('Token inválido');
     }
@@ -59,4 +60,9 @@ export class AuthService{
 async findUserByEmail(email: string) {
     return this.usersService.findOneByEmail(email);
 }
+
+async findUserById(id: number) {
+    return this.usersService.findOneById(id);
+}
+
 }

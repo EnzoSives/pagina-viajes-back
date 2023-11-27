@@ -10,7 +10,9 @@ export declare class AuthService {
     login({ email, password }: LoginDto): Promise<{
         access_token: string;
         email: string;
+        id: number;
     }>;
     getUserByToken(token: string): Promise<import("../users/entities/user.entity").User>;
     findUserByEmail(email: string): Promise<import("../users/entities/user.entity").User>;
+    findUserById(id: number): Promise<import("../users/entities/user.entity").User>;
 }

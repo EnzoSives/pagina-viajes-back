@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
+const blog_entity_1 = require("../../blogs/entities/blog.entity");
 const preferencia_usuario_entity_1 = require("../../preferencia-usuario/entities/preferencia-usuario.entity");
 const typeorm_1 = require("typeorm");
 let User = class User {
@@ -44,6 +45,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => preferencia_usuario_entity_1.PreferenciaUsuario, preferenciaUsuario => preferenciaUsuario.user),
     __metadata("design:type", Array)
 ], User.prototype, "preferencias", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => blog_entity_1.Blog, blog => blog.user),
+    __metadata("design:type", Array)
+], User.prototype, "blogs", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)(),
     __metadata("design:paramtypes", [String, String, String])
