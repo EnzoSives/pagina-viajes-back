@@ -16,17 +16,22 @@ export class BlogsController {
   @InjectRepository(User)
   private userRepository: Repository<User>) {}
 
+  @Get('all')
+  async getBlogs(): Promise<Blog[]>{
+    return this.blogsService.getAll();
+  }
+
   @UseGuards(AuthGuard)
   @Post('crear')
   async addBlog(@Request() req, @Body() blogdto: CreateBlogDto): Promise<Blog> {
     try {
-      console.log('Solicitud completa:', req.user);
+      console.log('Solicitud completa:', req);
       
-      const userId = req.user.id;  // Verifica si req.user está presente en la consola
+      const userId = req.user.email;  // Verifica si req.user está presente en la consola
       console.log('ID de usuario:', userId);
   
-      const blog = new Blog(blogdto.posteo);
-      blog.user = await this.userRepository.findOne({ where: { id: userId } });
+      const blog = new Blog(blogdto.posteo, blogdto.nombre);
+      blog.user = await this.userRepository.findOne({ where: { email: userId } });
       await this.blogRepository.save(blog);
   
       if (blog) {

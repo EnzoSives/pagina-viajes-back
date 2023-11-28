@@ -37,20 +37,22 @@ let AuthService = class AuthService {
         if (!isPasswordValid) {
             throw new common_1.UnauthorizedException('password incorrecto');
         }
-        const payload = { id: user.id, email: user.email };
+        const payload = {
+            email: user.email,
+            id: user.id,
+            name: user.username,
+        };
         const access_token = await this.jwtService.signAsync(payload);
         return {
-            access_token,
-            email,
-            id: user.id,
+            access_token
         };
     }
     async getUserByToken(token) {
         try {
             const decodedToken = this.jwtService.verify(token);
-            const { id } = decodedToken;
-            console.log(this.findUserById(id));
-            return this.findUserById(id);
+            const { email } = decodedToken;
+            console.log(this.findUserByEmail(email));
+            return this.findUserByEmail(email);
         }
         catch (error) {
             throw new common_1.UnauthorizedException('Token inválido');
@@ -58,9 +60,6 @@ let AuthService = class AuthService {
     }
     async findUserByEmail(email) {
         return this.usersService.findOneByEmail(email);
-    }
-    async findUserById(id) {
-        return this.usersService.findOneById(id);
     }
 };
 exports.AuthService = AuthService;

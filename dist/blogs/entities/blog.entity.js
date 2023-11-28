@@ -13,8 +13,9 @@ exports.Blog = void 0;
 const user_entity_1 = require("../../users/entities/user.entity");
 const typeorm_1 = require("typeorm");
 let Blog = class Blog {
-    constructor(posteo) {
+    constructor(posteo, nombre) {
         this.posteo = posteo;
+        this.nombre = nombre;
     }
 };
 exports.Blog = Blog;
@@ -27,12 +28,16 @@ __decorate([
     __metadata("design:type", String)
 ], Blog.prototype, "posteo", void 0);
 __decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Blog.prototype, "nombre", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, user => user.blogs),
     (0, typeorm_1.JoinColumn)({ name: 'id_user' }),
     __metadata("design:type", user_entity_1.User)
 ], Blog.prototype, "user", void 0);
 exports.Blog = Blog = __decorate([
     (0, typeorm_1.Entity)('blogs'),
-    __metadata("design:paramtypes", [String])
+    __metadata("design:paramtypes", [String, String])
 ], Blog);
 //# sourceMappingURL=blog.entity.js.map

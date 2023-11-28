@@ -29,8 +29,8 @@ let AuthController = class AuthController {
         return this.authService.login(loginDto);
     }
     async getUser(req) {
-        const { id } = req.user.id;
-        const user = await this.authService.findUserById(id);
+        const { email } = req.user;
+        const user = await this.authService.findUserByEmail(email);
         return { user };
     }
 };

@@ -9,6 +9,7 @@ export declare class BlogsController {
     private blogRepository;
     private userRepository;
     constructor(blogsService: BlogsService, blogRepository: Repository<Blog>, userRepository: Repository<User>);
+    getBlogs(): Promise<Blog[]>;
     addBlog(req: any, blogdto: CreateBlogDto): Promise<Blog>;
     findAll(): string;
     findOne(id: string): string;

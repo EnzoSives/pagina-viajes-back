@@ -28,13 +28,16 @@ let BlogsController = class BlogsController {
         this.blogRepository = blogRepository;
         this.userRepository = userRepository;
     }
+    async getBlogs() {
+        return this.blogsService.getAll();
+    }
     async addBlog(req, blogdto) {
         try {
-            console.log('Solicitud completa:', req.user);
-            const userId = req.user.id;
+            console.log('Solicitud completa:', req);
+            const userId = req.user.email;
             console.log('ID de usuario:', userId);
-            const blog = new blog_entity_1.Blog(blogdto.posteo);
-            blog.user = await this.userRepository.findOne({ where: { id: userId } });
+            const blog = new blog_entity_1.Blog(blogdto.posteo, blogdto.nombre);
+            blog.user = await this.userRepository.findOne({ where: { email: userId } });
             await this.blogRepository.save(blog);
             if (blog) {
                 return blog;
@@ -61,6 +64,12 @@ let BlogsController = class BlogsController {
     }
 };
 exports.BlogsController = BlogsController;
+__decorate([
+    (0, common_1.Get)('all'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], BlogsController.prototype, "getBlogs", null);
 __decorate([
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
     (0, common_1.Post)('crear'),

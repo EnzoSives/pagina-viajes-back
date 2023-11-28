@@ -9,10 +9,7 @@ export declare class AuthService {
     register({ username, password, email }: RegisterDto): Promise<import("../users/dto/create-user.dto").CreateUserDto & import("../users/entities/user.entity").User>;
     login({ email, password }: LoginDto): Promise<{
         access_token: string;
-        email: string;
-        id: number;
     }>;
     getUserByToken(token: string): Promise<import("../users/entities/user.entity").User>;
     findUserByEmail(email: string): Promise<import("../users/entities/user.entity").User>;
-    findUserById(id: number): Promise<import("../users/entities/user.entity").User>;
 }

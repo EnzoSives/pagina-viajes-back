@@ -10,12 +10,16 @@ export class Blog {
     @Column()
      posteo:string
 
+     @Column()
+     nombre:string
+
      @ManyToOne(() => User, user => user.blogs)
      @JoinColumn({ name: 'id_user' })
      user: User;
 
-     constructor(posteo: string) {
+     constructor(posteo: string, nombre:string) {
         this.posteo = posteo;
+        this.nombre = nombre;
      }
 
 }
