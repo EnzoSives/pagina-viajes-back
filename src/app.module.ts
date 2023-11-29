@@ -19,18 +19,18 @@ import { BlogsModule } from './blog/blog.module';
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 
-      // 'bpeyvodevjsywngcdapn-mysql.services.clever-cloud.com',
-      'localhost',
+      'bpeyvodevjsywngcdapn-mysql.services.clever-cloud.com',
+      // 'localhost',
       port: 3306,
       username: 
-      // 'ud9gxrkbn7fiilx5',
-      'root',
+      'ud9gxrkbn7fiilx5',
+      // 'root',
       password: 
-      // 'KwJxKGuGvgADKi3hu8yT',
-      'Cristiano7',
+      'KwJxKGuGvgADKi3hu8yT',
+      // 'Cristiano7',
       database: 
-      // 'bpeyvodevjsywngcdapn',
-      'db_tp',
+      'bpeyvodevjsywngcdapn',
+      // 'db_tp',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     })
