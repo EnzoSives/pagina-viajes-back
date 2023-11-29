@@ -8,6 +8,8 @@ import { Ciudad } from 'src/ciudad/entities/ciudad.entity';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sharp from 'sharp';
+import axios from 'axios';
+import * as FormData from 'form-data';
 
 
 @Injectable()
@@ -61,22 +63,56 @@ async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lu
   }
 
   // Guardar las imágenes en el sistema de archivos y obtener las rutas
-  const fileNames = await Promise.all(files.map((file, index) =>
-    this.saveImageToServer(file, 'lugar', lugarConIdProvisional.id)
-  ));
+  const imgBbUrls = await Promise.all(files.map(async (file, index) => {
+    const imgBbUrl = await this.uploadImageToImgBb(file);
+    return imgBbUrl;
+  }));
 
-   // Asignar las URLs de las imágenes a las propiedades correspondientes en la entidad Lugar
-   lugarConIdProvisional.url_image1 = this.generateImageUrl(fileNames[0]);
-   lugarConIdProvisional.url_image2 = this.generateImageUrl(fileNames[1]);
-   lugarConIdProvisional.url_image3 = this.generateImageUrl(fileNames[2]);
-   lugarConIdProvisional.url_image4 = this.generateImageUrl(fileNames[3]);
-  
+  // Asignar las URLs de las imágenes a las propiedades correspondientes en la entidad Lugar
+  lugarConIdProvisional.url_image1 = imgBbUrls[0];
+  lugarConIdProvisional.url_image2 = imgBbUrls[1];
+  lugarConIdProvisional.url_image3 = imgBbUrls[2];
+  lugarConIdProvisional.url_image4 = imgBbUrls[3];
 
   // Guardar el lugar actualizado en la base de datos
   const lugarFinal = await this.lugarRepository.save(lugarConIdProvisional);
 
   return lugarFinal;
 }
+
+private async uploadImageToImgBb(file: Express.Multer.File): Promise<string> {
+  const imgBbApiKey = 'b44f4528773f5c89010a350f4400aedc'; 
+  const formData = new FormData();
+
+  const compressedImageBuffer = await sharp(file.buffer)
+    .resize({ width: 600 , height: 600 }) // Ajusta el tamaño según tus necesidades
+    .toBuffer();
+
+  formData.append('image', file.buffer, {
+    filename: file.originalname,
+    contentType: file.mimetype,
+  });
+
+  try {
+    const response = await axios.post('https://api.imgbb.com/1/upload?key=' + imgBbApiKey, formData, {
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
+      },
+    });
+
+    if (response.data && response.data.data && response.data.data.url) {
+      const imageUrl = response.data.data.url;
+      return imageUrl;
+    } else {
+      throw new Error('La respuesta de imgBB no contiene la URL esperada.');
+    }
+  } catch (error) {
+    console.error('Error al subir la imagen a imgBB:', error.message);
+    throw new Error('Error al subir la imagen a imgBB');
+  }
+}
+
+
 
 
 

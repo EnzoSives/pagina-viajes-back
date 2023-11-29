@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UploadedFile, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UploadedFile, UseInterceptors, UploadedFiles, Req } from '@nestjs/common';
 import { LugarService } from './lugar.service';
 import { LugarDTO } from './dto/create-lugar.dto';
 import { Lugar } from './entities/lugar.entity';
@@ -19,10 +19,16 @@ export class LugarController {
   }
 
   @Post('crear')
-@UseInterceptors(FilesInterceptor('imagenes', 4)) // 'imagenes' es el nombre del campo para las imágenes y 4 es el número máximo de archivos
-async addLugar(@UploadedFiles() files: Express.Multer.File[], @Body() lugarDTO: LugarDTO): Promise<Lugar> {
-  return this.lugarService.agregarLugar(lugarDTO, files);
-}
+  @UseInterceptors(FilesInterceptor('imagenes', 4))
+  async addLugar(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() lugarDTO: LugarDTO,
+    @Req() req: Request, // Importa Request desde 'express'
+  ): Promise<Lugar> {
+    console.log('Cuerpo de la solicitud:', req.body);
+    return this.lugarService.agregarLugar(lugarDTO, files);
+  }
+  
 
 
    @Put('actualizar/:id')
