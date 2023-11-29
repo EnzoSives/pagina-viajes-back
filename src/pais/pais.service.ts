@@ -46,7 +46,7 @@ public async getId(id:number) : Promise<Pais>{
 
 async agregarPais(paisDTO: PaisDTO, files: Express.Multer.File[]): Promise<Pais> {
   // Crear un país sin ID asignado
-  const pais = new Pais(paisDTO.nombre, paisDTO.descripcion);
+  const pais = new Pais(paisDTO.nombre, paisDTO.descripcion, paisDTO.puntuacion);
   pais.continente = await this.continenteRepository.findOne({ where: { id: paisDTO.id_continente } });
 
   // Guardar el país sin persistirlo en la base de datos

@@ -7,6 +7,7 @@ import { Pais } from 'src/pais/entities/pais.entity';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Lugar } from 'src/lugar/entities/lugar.entity';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class CiudadService {
@@ -44,7 +45,7 @@ export class CiudadService {
 
   async agregarCiudad(ciudadDTO: CiudadDTO, files: Express.Multer.File[]): Promise<Ciudad> {
     // Crear un país sin ID asignado
-    const ciudad = new Ciudad(ciudadDTO.nombre, ciudadDTO.descripcion);
+    const ciudad = new Ciudad(ciudadDTO.nombre, ciudadDTO.descripcion, ciudadDTO.puntuacion);
     ciudad.pais = await this.paisRepository.findOne({ where: { id: ciudadDTO.id_pais } });
   
     // Guardar el país sin persistirlo en la base de datos

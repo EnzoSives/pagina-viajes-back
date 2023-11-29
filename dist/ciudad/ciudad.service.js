@@ -45,7 +45,7 @@ let CiudadService = class CiudadService {
         }
     }
     async agregarCiudad(ciudadDTO, files) {
-        const ciudad = new ciudad_entity_1.Ciudad(ciudadDTO.nombre, ciudadDTO.descripcion);
+        const ciudad = new ciudad_entity_1.Ciudad(ciudadDTO.nombre, ciudadDTO.descripcion, ciudadDTO.puntuacion);
         ciudad.pais = await this.paisRepository.findOne({ where: { id: ciudadDTO.id_pais } });
         const ciudadGuardado = await this.paisRepository.save(ciudad);
         const ciudadConIdProvisional = await this.paisRepository.findOne({

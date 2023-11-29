@@ -13,6 +13,9 @@ export class Pais {
 
   @Column({ default: null})
   descripcion: string;
+
+  @Column({default: 0})
+  puntuacion:number;
   
   @Column({default:'url'})
   url_image1: string;
@@ -33,9 +36,10 @@ export class Pais {
   @JoinColumn({ name: 'id_continente' })
   continente: Continente;
 
-  constructor(nombre: string, descripcion: string) {
+  constructor(nombre: string, descripcion: string, puntuacion:number) {
     this.nombre = nombre;
     this.descripcion = descripcion;
+    this.puntuacion = puntuacion;
     
   }
 

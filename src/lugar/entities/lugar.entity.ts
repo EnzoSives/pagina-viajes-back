@@ -20,6 +20,9 @@ export class Lugar {
 
   @Column()
   descripcion: string;
+  
+  @Column({default: 0})
+  puntuacion:number;
 
   @Column({default:'url'})
   url_image1: string;
@@ -46,9 +49,10 @@ export class Lugar {
   )
   preferenciaUsuario: PreferenciaUsuario[];
 
-  constructor(nombre: string, description: string) {
+  constructor(nombre: string, description: string, puntuacion:number) {
     this.nombre = nombre;
     this.descripcion = description;
+    this.puntuacion = puntuacion;
   
 
   }

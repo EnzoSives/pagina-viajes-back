@@ -14,9 +14,10 @@ const lugar_entity_1 = require("../../lugar/entities/lugar.entity");
 const pais_entity_1 = require("../../pais/entities/pais.entity");
 const typeorm_1 = require("typeorm");
 let Ciudad = class Ciudad {
-    constructor(nombre, descripcion) {
+    constructor(nombre, descripcion, puntuacion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.puntuacion = puntuacion;
     }
     getIdCiudad() {
         return this.id;
@@ -41,6 +42,10 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Ciudad.prototype, "descripcion", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 0 }),
+    __metadata("design:type", Number)
+], Ciudad.prototype, "puntuacion", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: 'url' }),
     __metadata("design:type", String)
@@ -68,6 +73,6 @@ __decorate([
 ], Ciudad.prototype, "lugares", void 0);
 exports.Ciudad = Ciudad = __decorate([
     (0, typeorm_1.Entity)('ciudades'),
-    __metadata("design:paramtypes", [String, String])
+    __metadata("design:paramtypes", [String, String, Number])
 ], Ciudad);
 //# sourceMappingURL=ciudad.entity.js.map

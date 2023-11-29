@@ -14,6 +14,9 @@ export class Ciudad {
   @Column()
   descripcion: string;
 
+  @Column({default: 0})
+  puntuacion:number;
+
   @Column({default:'url'})
   url_image1: string;
 
@@ -33,9 +36,10 @@ export class Ciudad {
   @OneToMany(() => Lugar, lugar => lugar.ciudad)
   lugares: Lugar[];
 
-  constructor(nombre:string, descripcion:string){
+  constructor(nombre:string, descripcion:string, puntuacion:number){
     this.nombre = nombre;
     this.descripcion = descripcion;
+    this.puntuacion = puntuacion;
 }
 
 public getIdCiudad():number{

@@ -45,7 +45,7 @@ let PaisService = class PaisService {
         }
     }
     async agregarPais(paisDTO, files) {
-        const pais = new pais_entity_1.Pais(paisDTO.nombre, paisDTO.descripcion);
+        const pais = new pais_entity_1.Pais(paisDTO.nombre, paisDTO.descripcion, paisDTO.puntuacion);
         pais.continente = await this.continenteRepository.findOne({ where: { id: paisDTO.id_continente } });
         const paisGuardado = await this.paisRepository.save(pais);
         const paisConIdProvisional = await this.paisRepository.findOne({

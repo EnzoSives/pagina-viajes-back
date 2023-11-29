@@ -46,7 +46,7 @@ let LugarService = class LugarService {
         }
     }
     async agregarLugar(lugarDTO, files) {
-        const lugar = new lugar_entity_1.Lugar(lugarDTO.nombre, lugarDTO.descripcion);
+        const lugar = new lugar_entity_1.Lugar(lugarDTO.nombre, lugarDTO.descripcion, lugarDTO.puntuacion);
         lugar.ciudad = await this.ciudadRepository.findOne({ where: { id: lugarDTO.id_ciudad } });
         const lugarGuardado = await this.lugarRepository.save(lugar);
         const lugarConIdProvisional = await this.lugarRepository.findOne({

@@ -10,6 +10,7 @@ import * as path from 'path';
 import * as sharp from 'sharp';
 import axios from 'axios';
 import * as FormData from 'form-data';
+import { validate } from 'class-validator';
 
 
 @Injectable()
@@ -47,7 +48,7 @@ public async getId(id:number) : Promise<Lugar>{
 
 async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lugar> {
   // Crear un lugar sin ID asignado
-  const lugar = new Lugar(lugarDTO.nombre, lugarDTO.descripcion);
+  const lugar = new Lugar(lugarDTO.nombre, lugarDTO.descripcion, lugarDTO.puntuacion);
   lugar.ciudad = await this.ciudadRepository.findOne({ where: { id: lugarDTO.id_ciudad } });
 
   // Guardar el lugar sin persistirlo en la base de datos

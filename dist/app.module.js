@@ -31,7 +31,7 @@ exports.AppModule = AppModule = __decorate([
                 host: 'localhost',
                 port: 3306,
                 username: 'root',
-                password: 'Cristiano7',
+                password: '4YwuPbb7W0uxGHg',
                 database: 'db_tp',
                 entities: [__dirname + '/**/*.entity{.ts,.js}'],
                 synchronize: true,

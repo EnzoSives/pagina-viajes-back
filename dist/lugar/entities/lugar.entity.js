@@ -15,9 +15,10 @@ const imagen_entity_1 = require("../../imagenes/entities/imagen.entity");
 const preferencia_usuario_entity_1 = require("../../preferencia-usuario/entities/preferencia-usuario.entity");
 const typeorm_1 = require("typeorm");
 let Lugar = class Lugar {
-    constructor(nombre, description) {
+    constructor(nombre, description, puntuacion) {
         this.nombre = nombre;
         this.descripcion = description;
+        this.puntuacion = puntuacion;
     }
     getIdLugar() {
         return this.id;
@@ -42,6 +43,10 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Lugar.prototype, "descripcion", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 0 }),
+    __metadata("design:type", Number)
+], Lugar.prototype, "puntuacion", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: 'url' }),
     __metadata("design:type", String)
@@ -73,6 +78,6 @@ __decorate([
 ], Lugar.prototype, "preferenciaUsuario", void 0);
 exports.Lugar = Lugar = __decorate([
     (0, typeorm_1.Entity)('lugares'),
-    __metadata("design:paramtypes", [String, String])
+    __metadata("design:paramtypes", [String, String, Number])
 ], Lugar);
 //# sourceMappingURL=lugar.entity.js.map

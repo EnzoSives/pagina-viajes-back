@@ -4,13 +4,14 @@ export declare class Pais {
     id: number;
     nombre: string;
     descripcion: string;
+    puntuacion: number;
     url_image1: string;
     url_image2: string;
     url_image3: string;
     url_image4: string;
     ciudades: Ciudad[];
     continente: Continente;
-    constructor(nombre: string, descripcion: string);
+    constructor(nombre: string, descripcion: string, puntuacion: number);
     getIdPais(): number;
     getNombre(): string;
     setNombre(nombre: string): void;

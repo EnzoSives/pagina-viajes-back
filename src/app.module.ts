@@ -27,7 +27,7 @@ import { BlogsModule } from './blog/blog.module';
       'root',
       password: 
       // 'KwJxKGuGvgADKi3hu8yT',
-      'Cristiano7',
+      '4YwuPbb7W0uxGHg',
       database: 
       // 'bpeyvodevjsywngcdapn',
       'db_tp',
