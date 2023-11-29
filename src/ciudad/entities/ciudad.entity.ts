@@ -11,7 +11,7 @@ export class Ciudad {
   @Column()
   nombre: string;
 
-  @Column()
+  @Column({ default: null, length: 1500 }) 
   descripcion: string;
 
   @Column({default: 0})

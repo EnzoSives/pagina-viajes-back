@@ -39,7 +39,7 @@ __decorate([
     __metadata("design:type", String)
 ], Pais.prototype, "nombre", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: null }),
+    (0, typeorm_1.Column)({ default: null, length: 1500 }),
     __metadata("design:type", String)
 ], Pais.prototype, "descripcion", void 0);
 __decorate([

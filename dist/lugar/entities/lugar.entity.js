@@ -40,7 +40,7 @@ __decorate([
     __metadata("design:type", String)
 ], Lugar.prototype, "nombre", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: null, length: 1500 }),
     __metadata("design:type", String)
 ], Lugar.prototype, "descripcion", void 0);
 __decorate([

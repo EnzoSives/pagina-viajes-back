@@ -62,8 +62,6 @@ async agregarLugar(lugarDTO: LugarDTO, files: Express.Multer.File[]): Promise<Lu
   if (!lugarConIdProvisional) {
     throw new Error(`No se pudo obtener el lugar con el ID provisional: ${lugarGuardado.id}`);
   }
-
-  // Guardar las imágenes en el sistema de archivos y obtener las rutas
   const imgBbUrls = await Promise.all(files.map(async (file, index) => {
     const imgBbUrl = await this.uploadImageToImgBb(file);
     return imgBbUrl;
@@ -112,6 +110,7 @@ private async uploadImageToImgBb(file: Express.Multer.File): Promise<string> {
     throw new Error('Error al subir la imagen a imgBB');
   }
 }
+
 
 
 

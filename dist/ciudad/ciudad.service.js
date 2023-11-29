@@ -18,9 +18,12 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const ciudad_entity_1 = require("./entities/ciudad.entity");
 const pais_entity_1 = require("../pais/entities/pais.entity");
+const lugar_entity_1 = require("../lugar/entities/lugar.entity");
 const fs = require("fs");
 const path = require("path");
-const lugar_entity_1 = require("../lugar/entities/lugar.entity");
+const sharp = require("sharp");
+const axios_1 = require("axios");
+const FormData = require("form-data");
 let CiudadService = class CiudadService {
     constructor(ciudadRepository, paisRepository, lugarRepository) {
         this.ciudadRepository = ciudadRepository;
@@ -47,20 +50,52 @@ let CiudadService = class CiudadService {
     async agregarCiudad(ciudadDTO, files) {
         const ciudad = new ciudad_entity_1.Ciudad(ciudadDTO.nombre, ciudadDTO.descripcion, ciudadDTO.puntuacion);
         ciudad.pais = await this.paisRepository.findOne({ where: { id: ciudadDTO.id_pais } });
-        const ciudadGuardado = await this.paisRepository.save(ciudad);
-        const ciudadConIdProvisional = await this.paisRepository.findOne({
+        const ciudadGuardado = await this.ciudadRepository.save(ciudad);
+        const ciudadConIdProvisional = await this.ciudadRepository.findOne({
             where: { id: ciudadGuardado.id },
         });
         if (!ciudadConIdProvisional) {
             throw new Error(`No se pudo obtener el país con el ID provisional: ${ciudadGuardado.id}`);
         }
-        const fileNames = await Promise.all(files.map((file, index) => this.saveImageToServer(file, 'ciudad', ciudadConIdProvisional.id)));
-        ciudadConIdProvisional.url_image1 = this.generateImageUrl(fileNames[0]);
-        ciudadConIdProvisional.url_image2 = this.generateImageUrl(fileNames[1]);
-        ciudadConIdProvisional.url_image3 = this.generateImageUrl(fileNames[2]);
-        ciudadConIdProvisional.url_image4 = this.generateImageUrl(fileNames[3]);
+        const imgBbUrls = await Promise.all(files.map(async (file, index) => {
+            const imgBbUrl = await this.uploadImageToImgBb(file);
+            return imgBbUrl;
+        }));
+        ciudadConIdProvisional.url_image1 = imgBbUrls[0];
+        ciudadConIdProvisional.url_image2 = imgBbUrls[1];
+        ciudadConIdProvisional.url_image3 = imgBbUrls[2];
+        ciudadConIdProvisional.url_image4 = imgBbUrls[3];
         const ciudadFinal = await this.ciudadRepository.save(ciudadConIdProvisional);
         return ciudadFinal;
+    }
+    async uploadImageToImgBb(file) {
+        const imgBbApiKey = 'b44f4528773f5c89010a350f4400aedc';
+        const formData = new FormData();
+        const compressedImageBuffer = await sharp(file.buffer)
+            .resize({ width: 600, height: 600 })
+            .toBuffer();
+        formData.append('image', file.buffer, {
+            filename: file.originalname,
+            contentType: file.mimetype,
+        });
+        try {
+            const response = await axios_1.default.post('https://api.imgbb.com/1/upload?key=' + imgBbApiKey, formData, {
+                headers: {
+                    'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
+                },
+            });
+            if (response.data && response.data.data && response.data.data.url) {
+                const imageUrl = response.data.data.url;
+                return imageUrl;
+            }
+            else {
+                throw new Error('La respuesta de imgBB no contiene la URL esperada.');
+            }
+        }
+        catch (error) {
+            console.error('Error al subir la imagen a imgBB:', error.message);
+            throw new Error('Error al subir la imagen a imgBB');
+        }
     }
     generateImageUrl(fileName) {
         const filePath = (fileName);

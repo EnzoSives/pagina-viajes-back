@@ -4,9 +4,12 @@ import { FindOneOptions, Repository } from 'typeorm';
 import { Ciudad } from './entities/ciudad.entity';
 import { CiudadDTO } from './dto/create-ciudad.dto';
 import { Pais } from 'src/pais/entities/pais.entity';
+import { Lugar } from 'src/lugar/entities/lugar.entity';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Lugar } from 'src/lugar/entities/lugar.entity';
+import * as sharp from 'sharp';
+import axios from 'axios';
+import * as FormData from 'form-data';
 import { validate } from 'class-validator';
 
 @Injectable()
@@ -49,10 +52,10 @@ export class CiudadService {
     ciudad.pais = await this.paisRepository.findOne({ where: { id: ciudadDTO.id_pais } });
   
     // Guardar el país sin persistirlo en la base de datos
-    const ciudadGuardado = await this.paisRepository.save(ciudad);
+    const ciudadGuardado = await this.ciudadRepository.save(ciudad);
   
     // Obtener el país con su ID asignado (ID provisional)
-    const ciudadConIdProvisional = await this.paisRepository.findOne({
+    const ciudadConIdProvisional = await this.ciudadRepository.findOne({
       where: { id: ciudadGuardado.id },
     });
   
@@ -61,24 +64,55 @@ export class CiudadService {
     }
   
     // Guardar las imágenes en el sistema de archivos y obtener las rutas
-    const fileNames = await Promise.all(files.map((file, index) =>
-      this.saveImageToServer(file, 'ciudad', ciudadConIdProvisional.id)
-    ));
-  
-    // Asignar las URLs de las imágenes a las propiedades correspondientes en la entidad Pais
-    ciudadConIdProvisional.url_image1 = this.generateImageUrl(fileNames[0]);
-    ciudadConIdProvisional.url_image2 = this.generateImageUrl(fileNames[1]);
-    ciudadConIdProvisional.url_image3 = this.generateImageUrl(fileNames[2]);
-    ciudadConIdProvisional.url_image4 = this.generateImageUrl(fileNames[3]);
-  
-    // Guardar el país actualizado en la base de datos
-    const ciudadFinal = await this.ciudadRepository.save(ciudadConIdProvisional);
-  
-    // Resto del código...
-  
-    return ciudadFinal;
+  const imgBbUrls = await Promise.all(files.map(async (file, index) => {
+    const imgBbUrl = await this.uploadImageToImgBb(file);
+    return imgBbUrl;
+  }));
+
+  // Asignar las URLs de las imágenes a las propiedades correspondientes en la entidad Lugar
+  ciudadConIdProvisional.url_image1 = imgBbUrls[0];
+  ciudadConIdProvisional.url_image2 = imgBbUrls[1];
+  ciudadConIdProvisional.url_image3 = imgBbUrls[2];
+  ciudadConIdProvisional.url_image4 = imgBbUrls[3];
+
+  // Guardar el lugar actualizado en la base de datos
+  const ciudadFinal = await this.ciudadRepository.save(ciudadConIdProvisional);
+
+  return ciudadFinal;
+}
+
+private async uploadImageToImgBb(file: Express.Multer.File): Promise<string> {
+  const imgBbApiKey = 'b44f4528773f5c89010a350f4400aedc'; 
+  const formData = new FormData();
+
+  const compressedImageBuffer = await sharp(file.buffer)
+    .resize({ width: 600 , height: 600 }) // Ajusta el tamaño según tus necesidades
+    .toBuffer();
+
+  formData.append('image', file.buffer, {
+    filename: file.originalname,
+    contentType: file.mimetype,
+  });
+
+  try {
+    const response = await axios.post('https://api.imgbb.com/1/upload?key=' + imgBbApiKey, formData, {
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
+      },
+    });
+
+    if (response.data && response.data.data && response.data.data.url) {
+      const imageUrl = response.data.data.url;
+      return imageUrl;
+    } else {
+      throw new Error('La respuesta de imgBB no contiene la URL esperada.');
+    }
+  } catch (error) {
+    console.error('Error al subir la imagen a imgBB:', error.message);
+    throw new Error('Error al subir la imagen a imgBB');
   }
-  
+}
+
   private generateImageUrl( fileName: string): string {
     const filePath= (fileName);
     return filePath.split(path.sep).join('/');

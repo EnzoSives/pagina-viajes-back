@@ -11,7 +11,7 @@ export class Pais {
   @Column({ default: null})
   nombre: string;
 
-  @Column({ default: null})
+  @Column({ default: null, length: 1500}) 
   descripcion: string;
 
   @Column({default: 0})

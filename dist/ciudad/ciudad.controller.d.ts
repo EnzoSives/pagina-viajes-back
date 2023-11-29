@@ -7,7 +7,7 @@ export declare class CiudadController {
     constructor(ciudadService: CiudadService);
     getCities(): Promise<Ciudad[]>;
     getId(id: number): Promise<Ciudad>;
-    addLugar(files: Express.Multer.File[], CiudadDTO: CiudadDTO): Promise<Ciudad>;
+    addCiudad(files: Express.Multer.File[], CiudadDTO: CiudadDTO, req: Request): Promise<Ciudad>;
     updateCiudadId(id: number, ciudad: CiudadDTO): Promise<Ciudad>;
     deleteCiudad(id: number): Promise<boolean>;
 }

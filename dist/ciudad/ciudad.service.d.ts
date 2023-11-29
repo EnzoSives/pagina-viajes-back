@@ -13,6 +13,7 @@ export declare class CiudadService {
     getAll(): Promise<Ciudad[]>;
     getId(id: number): Promise<Ciudad>;
     agregarCiudad(ciudadDTO: CiudadDTO, files: Express.Multer.File[]): Promise<Ciudad>;
+    private uploadImageToImgBb;
     private generateImageUrl;
     private saveImageToServer;
     updateCiudadId(id: number, ciudadDTO: CiudadDTO): Promise<Ciudad>;
